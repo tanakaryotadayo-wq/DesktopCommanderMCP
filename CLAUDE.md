@@ -124,6 +124,47 @@ When adding a new tool, add a corresponding test file in `test/`. Follow the exi
 - `.png/.jpg/.gif/.webp` → base64 image response
 - Everything else → text or binary
 
+## Agent Boundaries
+
+**Always do (no confirmation needed):**
+- Read files, run searches, call `list_*` / `get_*` tools
+- Run `npm run build`, `npm test`, `npm run validate:tools`
+- Edit files in `src/` that you have read first
+
+**Ask before doing:**
+- Deleting or moving files
+- Changing configuration values in `~/.claude-server-commander/config.json`
+- Modifying `blockedCommands` list
+- Publishing (`npm run release`) or bumping versions
+
+**Never do:**
+- Edit anything under `dist/` — it is generated
+- Edit `node_modules/`
+- Commit secrets, API keys, or file paths to telemetry
+- Remove a failing test without explicit approval
+- Weaken security logic in `command-manager.ts` or `config.ts`
+
+## MCP Protocol Notes (June 2025 Spec)
+
+When adding new tools, use `outputSchema` + `structuredContent` for typed outputs (avoids agent-side parsing):
+```typescript
+// In tool definition (server.ts)
+outputSchema: zodToJsonSchema(MyOutputSchema),
+
+// In handler return value
+return {
+  content: [{ type: 'text', text: summary }],
+  structuredContent: { result: typedData },  // matches outputSchema
+};
+```
+
+**Error response design principle:** Error messages are read by an AI agent, not a human. Write them to answer "what should I try next?" — include the constraint that was violated and a hint for the correct approach.
+
+```typescript
+// Bad: "Permission denied"
+// Good: "Path '/etc/passwd' is outside allowedDirectories. Use a path under one of: [...]"
+```
+
 ## Security Notes (Do Not Weaken)
 
 - `CommandManager` must fail **closed** — any parsing ambiguity should deny, not allow
