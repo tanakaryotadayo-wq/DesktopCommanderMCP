@@ -124,26 +124,6 @@ When adding a new tool, add a corresponding test file in `test/`. Follow the exi
 - `.png/.jpg/.gif/.webp` → base64 image response
 - Everything else → text or binary
 
-## Agent Boundaries
-
-**Always do (no confirmation needed):**
-- Read files, run searches, call `list_*` / `get_*` tools
-- Run `npm run build`, `npm test`, `npm run validate:tools`
-- Edit files in `src/` that you have read first
-
-**Ask before doing:**
-- Deleting or moving files
-- Changing configuration values in `~/.claude-server-commander/config.json`
-- Modifying `blockedCommands` list
-- Publishing (`npm run release`) or bumping versions
-
-**Never do:**
-- Edit anything under `dist/` — it is generated
-- Edit `node_modules/`
-- Commit secrets, API keys, or file paths to telemetry
-- Remove a failing test without explicit approval
-- Weaken security logic in `command-manager.ts` or `config.ts`
-
 ## MCP Protocol Notes (June 2025 Spec)
 
 When adding new tools, use `outputSchema` + `structuredContent` for typed outputs (avoids agent-side parsing):
